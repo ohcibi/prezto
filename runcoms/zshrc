@@ -11,3 +11,18 @@ if [[ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ]]; then
 fi
 
 # Customize to your needs...
+bindkey "^R" history-incremental-search-backward
+path=(~/bin ~/local/bin $path)
+
+source ~/.aliases
+
+WORKON_HOME=$HOME/.pyenv
+source /usr/local/bin/virtualenvwrapper.sh
+
+doge
+export VISUAL=vim
+export PYTHONSTARTUP=/Users/ohcibi/.pythonrc
+
+export EDITOR=vim
+
+export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting

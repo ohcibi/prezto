@@ -1,0 +1,99 @@
+#
+# A theme inspired by sorin and nicoulaj and my old theme
+#
+# Authors:
+#   Tobias Witt <tobias.witt@hhu.de>
+#
+# Features:
+#   - Lambda Prompt Character (Half-Life 3 confirmed!!!)
+#   - Two lines.
+#   - VCS information in both prompts
+#   - If in a repository: show only the repository dirname and its subpaths
+#   - Crops the path to a defined length
+#   - Has a last command success indicator
+#   - Shows if logged in as root or not.
+#
+# Depends:
+#   - prezto git module
+#
+# Screenshots:
+#   https://www.dropbox.com/s/088v71s787dejfq/Screenshot%202014-07-12%2013.58.20.png
+#
+
+function prompt_ohcibi_preexec {
+  editor-info
+}
+
+function prompt_ohcibi_precmd {
+  vcs_info
+  git-info
+  ruby-info
+}
+
+function prompt_ohcibi_setup {
+  setopt LOCAL_OPTIONS
+  unsetopt XTRACE KSH_ARRAYS
+  prompt_opts=(cr percent subst)
+
+  # Load required functions.
+  autoload -Uz add-zsh-hook
+  autoload -Uz vcs_info
+
+  # Add hook for calling vcs_info before each command.
+  add-zsh-hook precmd prompt_ohcibi_precmd
+
+  # Customizable parameters.
+  local max_path_chars=30
+  local user_char='λ'
+  local root_char='G'
+  local success_color='%F{071}'
+  local failure_color='%F{124}'
+  local vcs_info_color='%F{242}'
+  local def_color='%F{3}'
+  local path_color='%F{4}'
+  local prompt_color='%F{9}'
+  local user_color='%F{17}'
+  local branch_color='%F{6}'
+  local action_color='%F{23}'
+  local commit_color='%F{23}'
+  local host_color='%F{52}'
+  local ruby_color='%F{099}'
+
+  # Set vcs_info parameters.
+  zstyle ':vcs_info:*' enable bzr git hg svn
+  zstyle ':vcs_info:*' actionformats "%S" "%F{5}(${action_color}%a%F{5})%f ${path_color}%r/${path_color}"
+  zstyle ':vcs_info:*' formats "%S" "${path_color}%r/"
+  zstyle ':vcs_info:*' nvcsformats "%~" ""
+
+  zstyle ':prezto:module:editor:info:completing' format '%B%F{red}...%f%b'
+  zstyle ':prezto:module:editor:info:keymap:primary' format "%B%(?;${success_color}✔;${failure_color}✗)%f%b"
+  zstyle ':prezto:module:editor:info:keymap:alternate' format '%F{166}☭%f'
+
+  zstyle ':prezto:module:git:info' verbose 'yes'
+  zstyle ':prezto:module:git:info:action' format ' %%B%F{yellow}%s%f%%b'
+  zstyle ':prezto:module:git:info:added' format ' %%B%F{green}✚%f%%b'
+  zstyle ':prezto:module:git:info:ahead' format ' %%B%F{blue}⇡%f%%b'
+  zstyle ':prezto:module:git:info:behind' format ' %%B%F{green}⇣%f%%b'
+  zstyle ':prezto:module:git:info:branch' format "${branch_color}%b%f"
+  zstyle ':prezto:module:git:info:commit' format "${commit_color}%.7c%f"
+  zstyle ':prezto:module:git:info:deleted' format ' %%B%F{red}✖%f%%b'
+  zstyle ':prezto:module:git:info:modified' format ' %%B%F{blue}✱%f%%b'
+  zstyle ':prezto:module:git:info:position' format '%F{red}%p%f'
+  zstyle ':prezto:module:git:info:renamed' format ' %%B%F{magenta}➜%f%%b'
+  zstyle ':prezto:module:git:info:stashed' format ' %%B%F{cyan}✭%f%%b'
+  zstyle ':prezto:module:git:info:unmerged' format ' %%B%F{yellow}═%f%%b'
+  zstyle ':prezto:module:git:info:untracked' format ' %%B%F{yellow}◼%f%%b'
+  zstyle ':prezto:module:git:info:keys' format \
+    'prompt' ' %p%b@%c' \
+    'rprompt' '%A%B%S%s%a%d%m%r%U%u'
+
+  zstyle ':prezto:module:ruby:info:version' format " ${ruby_color}%v%f"
+
+  # Define prompts.
+  PROMPT='${editor_info[keymap]}'"${path_color}%B "'${vcs_info_msg_1_}'"%${max_path_chars}<...<"'${vcs_info_msg_0_%%.}'"%<<%b%f"'${git_info[prompt]}''${ruby_info[version]}'${editor_info[insert]}${editor_info[keymap]}${editor_info[overwrite]}${VIM:+" %B%F{green}V%f%b"}"
+${prompt_color}%B%(!.${root_char}.${user_char})%b%f "
+  RPROMPT='${git_info[rprompt]}'
+  SPROMPT="zsh: correct %F{red}%R%f to %F{green}%r%f [nyae]? "
+}
+
+prompt_ohcibi_setup "$@"
