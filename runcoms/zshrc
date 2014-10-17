@@ -21,7 +21,7 @@ source /usr/local/bin/virtualenvwrapper.sh
 
 doge
 export VISUAL=vim
-export PYTHONSTARTUP=/Users/ohcibi/.pythonrc
+export PYTHONSTARTUP=$HOME/.pythonrc
 
 export EDITOR=vim
 
