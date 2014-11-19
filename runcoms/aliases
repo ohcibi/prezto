@@ -21,3 +21,9 @@ alias bec='be cucumber'
 alias gwds="gwd --staged"
 alias glga="git log --topo-order --all --graph --pretty=format:\${_git_log_medium_format}"
 alias glgb="git log --topo-order --all --graph --pretty=format:\${_git_log_brief_format}"
+
+# probcli
+alias probcli="rlwrap /Users/ohcibi/Applications/ProB/probcli -repl -p REPL_UNICODE TRUE -init"
+
+# mvim
+alias :e="mvim"
