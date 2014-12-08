@@ -20,27 +20,87 @@
 #   https://www.dropbox.com/s/088v71s787dejfq/Screenshot%202014-07-12%2013.58.20.png
 #
 
+# turns seconds into human readable time
+# 165392 => 1d 21h 56m 32s
+# borrowed from sindresorhus/pure
+prompt_ohcibi_human_time() {
+  local tmp=$1
+  local days=$(( tmp / 60 / 60 / 24 ))
+  local hours=$(( tmp / 60 / 60 % 24 ))
+  local minutes=$(( tmp / 60 % 60 ))
+  local seconds=$(( tmp % 60 ))
+  (( $days > 0 )) && echo -n "${days}d "
+  (( $hours > 0 )) && echo -n "${hours}h "
+  (( $minutes > 0 )) && echo -n "${minutes}m "
+  echo "${seconds}s"
+}
+
+# displays the exec time of the last command if set threshold was exceeded
+# borrowed from sindresorhus/pure
+prompt_ohcibi_cmd_exec_time() {
+  local timeout=5
+  local stop=$EPOCHSECONDS
+  local start=${cmd_timestamp:-$stop}
+  integer elapsed=$stop-$start
+  (($elapsed > ${PURE_CMD_MAX_EXEC_TIME:=$timeout})) && prompt_ohcibi_human_time $elapsed
+}
+
 function prompt_ohcibi_preexec {
-  editor-info
+  # borrowed from sindresorhus/pure
+  cmd_timestamp=$EPOCHSECONDS
+  cmd_executed=$2
+
+  print -Pn "\e]0;"
+  echo -nE "$PWD:t: $2"
+  print -Pn "\a"
 }
 
 function prompt_ohcibi_precmd {
   vcs_info
   git-info
   ruby-info
+
+  unset exec_time
+  typeset -gA exec_time
+
+  local elapsed
+  local elapsed_format
+  local elapsed_formatted
+
+  elapsed="`prompt_ohcibi_cmd_exec_time`"
+  if [[ -n $elapsed ]]; then
+    local cmd_format
+    local cmd_formatted
+    zstyle -s ':prezto:module:exec_time:elapsed_format' format 'elapsed_format'
+    zformat -f elapsed_formatted "$elapsed_format" "t:$elapsed"
+    exec_time[elapsed]="$elapsed_formatted"
+
+    zstyle -s ':prezto:module:exec_time:cmd_format' format 'cmd_format'
+    zformat -f cmd_formatted "$cmd_format" "c:$cmd_executed"
+    exec_time[cmd]="$cmd_formatted"
+  fi
+
+  # reset value since `preexec` isn't always triggered
+  unset cmd_timestamp
 }
 
 function prompt_ohcibi_setup {
+  # prevent percentage showing up
+  # if output doesn't end with a newline
+  # borrowed from sindresorhus/pure
+  export PROMPT_EOL_MARK=''
+
   setopt LOCAL_OPTIONS
   unsetopt XTRACE KSH_ARRAYS
   prompt_opts=(cr percent subst)
 
   # Load required functions.
+  zmodload zsh/datetime
   autoload -Uz add-zsh-hook
   autoload -Uz vcs_info
 
-  # Add hook for calling vcs_info before each command.
   add-zsh-hook precmd prompt_ohcibi_precmd
+  add-zsh-hook preexec prompt_ohcibi_preexec
 
   # Customizable parameters.
   local max_path_chars=30
@@ -89,9 +149,13 @@ function prompt_ohcibi_setup {
 
   zstyle ':prezto:module:ruby:info:version' format " ${ruby_color}%v%f"
 
+  zstyle ':prezto:module:exec_time:elapsed_format' format "%F{yellow}%t%f "
+  #zstyle ':prezto:module:exec_time:cmd_format' format "%F{green}\`%c\`:%f "
+  zstyle ':prezto:module:exec_time:cmd_format' format ""
+
   # Define prompts.
   PROMPT='${editor_info[keymap]}'"${path_color}%B "'${vcs_info_msg_1_}'"%${max_path_chars}<...<"'${vcs_info_msg_0_%%.}'"%<<%b%f"'${git_info[prompt]}''${ruby_info[version]}'${editor_info[insert]}${editor_info[keymap]}${editor_info[overwrite]}${VIM:+" %B%F{green}V%f%b"}"
-${prompt_color}%B%(!.${root_char}.${user_char})%b%f "
+"'${exec_time[cmd]}''${exec_time[elapsed]}'"${prompt_color}%B%(!.${root_char}.${user_char})%b%f "
   RPROMPT='${git_info[rprompt]}'
   SPROMPT="zsh: correct %F{red}%R%f to %F{green}%r%f [nyae]? "
 }
