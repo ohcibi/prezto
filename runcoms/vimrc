@@ -83,11 +83,6 @@ nmap N Nzz
 
 noremap <c-o> :!open %<cr>
 
-noremap <C-H> :wincmd h<CR>
-noremap <C-J> :wincmd j<CR>
-noremap <C-K> :wincmd k<CR>
-noremap <C-L> :wincmd l<CR>
-
 noremap <C-c> :BD<CR>
 
 noremap <leader>c :CoffeeCompile vert<CR>
