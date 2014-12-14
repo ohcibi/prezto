@@ -1,3 +1,10 @@
 *.zwc
 *.zwc.old
 modules/*/cache.zsh
+
+# vim
+vim/bundle/
+vim/views/
+vim/backup
+vim/undo/
+vim/.netrwhist
