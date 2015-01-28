@@ -59,6 +59,8 @@ function prompt_ohcibi_precmd {
   vcs_info
   git-info
   ruby-info
+  python-info
+  node-info
 
   unset exec_time
   typeset -gA exec_time
@@ -145,18 +147,22 @@ function prompt_ohcibi_setup {
   zstyle ':prezto:module:git:info:untracked' format ' %%B%F{yellow}◼%f%%b'
   zstyle ':prezto:module:git:info:keys' format \
     'prompt' ' %p%b@%c' \
-    'rprompt' '%A%B%S%s%a%d%m%r%U%u'
+    'rprompt' '%A%B%S%s%a%d%m%r%U%u '
 
   zstyle ':prezto:module:ruby:info:version' format " ${ruby_color}%v%f"
 
   zstyle ':prezto:module:exec_time:elapsed_format' format "%F{yellow}%t%f "
-  #zstyle ':prezto:module:exec_time:cmd_format' format "%F{green}\`%c\`:%f "
+  #zstyle ':prezto:module:exec_time:cmd_for:mat' format "%F{green}\`%c\`:%f "
   zstyle ':prezto:module:exec_time:cmd_format' format ""
 
+  zstyle ':prezto:module:python:info:virtualenv' format " %F{094}(%v)%f"
+
+  zstyle ':prezto:module:node:info:version' format ' %F{070}node-%v%f'
+
   # Define prompts.
-  PROMPT='${editor_info[keymap]}'"${path_color}%B "'${vcs_info_msg_1_}'"%${max_path_chars}<...<"'${vcs_info_msg_0_%%.}'"%<<%b%f"'${git_info[prompt]}''${ruby_info[version]}'${editor_info[insert]}${editor_info[keymap]}${editor_info[overwrite]}${VIM:+" %B%F{green}V%f%b"}"
-"'${exec_time[cmd]}''${exec_time[elapsed]}'"${prompt_color}%B%(!.${root_char}.${user_char})%b%f "
-  RPROMPT='${git_info[rprompt]}'
+  PROMPT='${editor_info[keymap]}'"${path_color}%B "'${vcs_info_msg_1_}'"%${max_path_chars}<...<"'${vcs_info_msg_0_%%.}'"%<<%b%f"'${git_info[prompt]}''${ruby_info[version]}${node_info[version]}'${editor_info[insert]}${editor_info[keymap]}${editor_info[overwrite]}${VIM:+" %B%F{green}V%f%b"}"
+"'${exec_time[cmd]}''${exec_time[elapsed]}'"${prompt_color}%B%(!.${root_char}.${user_char})%b%f%_ "
+  RPROMPT='${git_info[rprompt]}%B%F{052}[%F{022}%*%f%F{052}]%f%b${python_info[virtualenv]}'
   SPROMPT="zsh: correct %F{red}%R%f to %F{green}%r%f [nyae]? "
 }
 
