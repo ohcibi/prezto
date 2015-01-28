@@ -12,7 +12,6 @@ fi
 
 # Customize to your needs...
 bindkey "^R" history-incremental-search-backward
-path=(~/bin ~/local/bin $path)
 
 source ~/.aliases
 
@@ -26,6 +25,13 @@ export PYTHONSTARTUP=$HOME/.pythonrc
 
 export EDITOR=vim
 
-export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
-
 export REPORTTIME=5
+
+export NVM_DIR="$HOME/.nvm"
+
+path=(~/bin ~/local/bin /usr/local/heroku/bin $path ~/.rvm/bin)
+
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
+
+[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
+
