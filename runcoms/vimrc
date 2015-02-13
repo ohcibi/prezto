@@ -122,6 +122,9 @@ noremap <c-b> :CtrlPBuffer<cr>
 "convenience
 noremap <cr> :nohlsearch<cr>
 
+" markdown
+noremap <leader>m :QuickRun markdown<cr>
+
 set mouse=a
 set backup
 set undofile                "so is persistent undo ...

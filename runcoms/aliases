@@ -28,5 +28,5 @@ alias probcli="rlwrap /Users/ohcibi/Applications/ProB/probcli -repl -p REPL_UNIC
 # mvim
 alias :e="mvim"
 
-#git=hub
-alias git=hub
+#ember
+alias em=ember
