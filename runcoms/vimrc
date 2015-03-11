@@ -120,7 +120,7 @@ map <F10> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans
 noremap <c-b> :CtrlPBuffer<cr>
 
 "convenience
-noremap <cr> :nohlsearch<cr>
+noremap <leader><cr> :nohlsearch<cr>
 
 " markdown
 noremap <leader>m :QuickRun markdown<cr>
