@@ -21,6 +21,7 @@ alias bec='be cucumber'
 alias gwds="gwd --staged"
 alias glga="git log --topo-order --all --graph --pretty=format:\${_git_log_medium_format}"
 alias glgb="git log --topo-order --all --graph --pretty=format:\${_git_log_brief_format}"
+alias gic="git commit -m \"Initial commit\" --allow-empty"
 
 # probcli
 alias probcli="rlwrap /Users/ohcibi/Applications/ProB/probcli -repl -p REPL_UNICODE TRUE -init"
