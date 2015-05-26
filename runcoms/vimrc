@@ -66,6 +66,8 @@ set smartcase
 " split
 set splitright
 
+set showcmd
+
 " colors and formatting
 if has("gui_running")
   colorscheme tidy
@@ -133,7 +135,19 @@ noremap <leader>r :!bundle exec rspec %<cr>
 nmap <leader>R :!bundle exec rspec spec<CR>
 
 
-vmap <leader>t :Tabularize /
+" Tabularize
+
+vmap gt        :Tabularize /
+vmap gt=       :Tabularize /=<cr>
+vmap gt&       :Tabularize /&<cr>
+vmap gt.       :Tabularize /.<cr>
+vmap gt:       :Tabularize /:<cr>
+vmap gt,       :Tabularize /,<cr>
+vmap gt;       :Tabularize /;<cr>
+vmap gt<space> :Tabularize / <cr>
+
+" Buffers
+map gl :ls<cr>
 
 " show highlighting group under cursor when pressing F10
 map <F10> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<'
