@@ -34,3 +34,9 @@ alias em=ember
 
 #ssh
 alias ssh="TERM=xterm-256color ssh"
+
+#ack
+alias ack="ag"
+
+#fuck
+alias fuck='eval $(thefuck $(fc -ln -1 | tail -n 1)); fc -R'
