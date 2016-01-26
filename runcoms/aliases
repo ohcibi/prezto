@@ -22,6 +22,9 @@ alias gwds="gwd --staged"
 alias glga="git log --topo-order --all --graph --pretty=format:\${_git_log_medium_format}"
 alias glgb="git log --topo-order --all --graph --pretty=format:\${_git_log_brief_format}"
 alias gic="git commit -m \"Initial commit\" --allow-empty"
+alias gia.="gia ."
+alias gmf="gm --ff"
+alias glf="git log --follow"
 
 # probcli
 alias probcli="rlwrap /Users/ohcibi/Applications/ProB/probcli -repl -p REPL_UNICODE TRUE -init"
@@ -34,9 +37,17 @@ alias em=ember
 
 #ssh
 alias ssh="TERM=xterm-256color ssh"
+alias brew="TERM=xterm-256color brew"
 
 #ack
 alias ack="ag"
 
 #fuck
 alias fuck='eval $(thefuck $(fc -ln -1 | tail -n 1)); fc -R'
+
+#fasd
+alias f="fasd"
+alias :e="f -e vim -f -i"
+
+#gittower
+alias t="gittower ."
