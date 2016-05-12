@@ -8,3 +8,7 @@ vim/views/
 vim/backup
 vim/undo/
 vim/.netrwhist
+
+vim/spell
+vim/dein
+

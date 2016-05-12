@@ -1,44 +1,75 @@
-set nocompatible
-filetype off
-
-"NeoBundle Scripts-----------------------------
-if has('vim_starting')
-  if &compatible
-    set nocompatible               " Be iMproved
-  endif
-
-  " Required:
-  set runtimepath+=$HOME/.vim/bundle/neobundle.vim/
+" set nocompatible
+" filetype off
+"
+" "NeoBundle Scripts-----------------------------
+" if has('vim_starting')
+"   if &compatible
+"     set nocompatible               " Be iMproved
+"   endif
+"
+"   " Required:
+"   set runtimepath+=$HOME/.vim/bundle/neobundle.vim/
+" endif
+"
+" " Required:
+" call neobundle#begin(expand('$HOME/.vim/bundle'))
+"
+" " Let NeoBundle manage NeoBundle
+" " Required:
+" NeoBundleFetch 'Shougo/neobundle.vim'
+"
+" source $HOME/.vim/bundlerc.vim
+"
+" " Required:
+" call neobundle#end()
+"
+" " Required:
+" filetype plugin indent on
+"
+" " If there are uninstalled bundles found on startup,
+" " this will conveniently prompt you to install them.
+" NeoBundleCheck
+" "End NeoBundle Scripts-------------------------
+"dein Scripts-----------------------------
+if &compatible
+  set nocompatible               " Be iMproved
 endif
 
 " Required:
-call neobundle#begin(expand('$HOME/.vim/bundle'))
-
-" Let NeoBundle manage NeoBundle
-" Required:
-NeoBundleFetch 'Shougo/neobundle.vim'
-
-source $HOME/.vim/bundlerc
+set runtimepath^=~/.vim/dein/repos/github.com/Shougo/dein.vim
 
 " Required:
-call neobundle#end()
+call dein#begin(expand('~/.vim/dein'))
+
+" Let dein manage dein
+" Required:
+call dein#add('Shougo/dein.vim')
+
+source $HOME/.vim/bundlerc.vim
+
+" Required:
+call dein#end()
 
 " Required:
 filetype plugin indent on
 
-" If there are uninstalled bundles found on startup,
-" this will conveniently prompt you to install them.
-NeoBundleCheck
-"End NeoBundle Scripts-------------------------
+" If you want to install not installed plugins on startup.
+if dein#check_install()
+ call dein#install()
+endif
 
-filetype plugin indent on
-syntax on
+"End dein Scripts-------------------------
+
+
 set grepprg="grep -nH $*"
 
 let mapleader=","
+let maplocalleader=','
+
+runtime! vimrc.d/**.vim
+runtime! vimrc.local.d/**.vim
 
 " basic
-set background=light
 set number
 set ruler
 set lbr
@@ -67,36 +98,6 @@ set smartcase
 set splitright
 
 set showcmd
-
-" colors and formatting
-if has("gui_running")
-  colorscheme tidy
-else
-  colorscheme github
-end
-highlight Comment cterm=italic cterm=italic gui=italic
-set colorcolumn=80
-set cursorline
-highlight CursorLine term=underline cterm=None ctermbg=195 gui=None guibg=#ccddff
-hi SpellBad term=underline ctermfg=NONE cterm=underline ctermbg=225
-hi Error term=underline ctermfg=NONE cterm=underline ctermbg=225
-
-hi boldFaced cterm=bold term=bold gui=bold
-match boldFaced /[()\[\]{}]/
-
-" php doc tags
-hi phpDocTags term=None cterm=bold ctermfg=235 gui=bold guifg=#222288
-hi phpCommentTitle term=None cterm=bold ctermfg=240 gui=bold guifg=#2233AA
-hi phpDocParam cterm=NONE ctermfg=240 gui=NONE guifg=#222255
-hi phpDocIdentifier cterm=NONE ctermfg=240 gui=bold guifg=#333388
-
-" eclipse like additions
-" Bubble single lines
-nmap <C-Up> [e
-nmap <C-Down> ]e
-" Bubble multiple lines
-vmap <C-Up> [egv
-vmap <C-Down> ]egv
 
 " command-t
 set wildignore+=*.zip,*.gz,*.bz2,*.xz,*.class
@@ -193,17 +194,6 @@ command! Gca Gcommit --amend
 
 map <leader>' :s/'/"/g 100000<cr>
 " END VIM RSPEC & CUCUMBER
-
-" Enable snipMate compatibility feature.
-let g:neosnippet#enable_snipmate_compatibility = 1
-
-" Tell Neosnippet about the other snippets
-let g:neosnippet#snippets_directory='~/.vim/bundle/vim-snippets/snippets'
-
-" Neosnippet Plugin key-mappings.
-imap <C-k>     <Plug>(neosnippet_expand_or_jump)
-smap <C-k>     <Plug>(neosnippet_expand_or_jump)
-xmap <C-k>     <Plug>(neosnippet_expand_target)
 
 " For snippet_complete marker.
 if has('conceal')
