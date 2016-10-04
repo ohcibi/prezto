@@ -35,3 +35,6 @@ add-zsh-hook chpwd load-nvmrc
 
 # added by travis gem
 [ -f /Users/ohcibi/.travis/travis.sh ] && source /Users/ohcibi/.travis/travis.sh
+
+# autosuggestions
+bindkey '' autosuggest-accept
