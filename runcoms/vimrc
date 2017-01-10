@@ -114,6 +114,9 @@ au BufRead,BufNewFile {*.yml} set ft=yaml
 
 " make and python use real tabs
 au FileType make set noexpandtab
+au FileType python set noexpandtab
+au FileType help set noexpandtab
+au FileType help set softtabstop=8
 
 " define quotes used by latex suite
 let b:Tex_SmartQuoteOpen = '"`'
@@ -135,6 +138,8 @@ map <leader>a :A<cr>
 
 noremap <leader>r :!bundle exec rspec %<cr>
 nmap <leader>R :!bundle exec rspec spec<CR>
+
+map <leader>f :Autoformat<cr>
 
 
 " Tabularize
@@ -318,3 +323,18 @@ set path=.,**
 set wildmenu
 
 set colorcolumn=100
+
+let g:UltiSnipsUsePythonVersion=3
+
+call denite#custom#var('file_rec', 'command',
+  \ ['ag', '--follow', '--nocolor', '--nogroup', '-g', ''])
+call denite#custom#source('file_rec', 'matchers', ['matcher_fuzzy', 'matcher_ignore_globs'])
+call denite#custom#filter('matcher_ignore_globs', 'ignore_globs',
+      \ [ '*~', '*.o', '*.exe', '*.bak',
+      \ '.DS_Store', '*.pyc', '*.sw[po]', '*.class',
+      \ '.hg/', '.git/', '.bzr/', '.svn/',
+      \ 'node_modules/', 'bower_components/', 'tmp/', 'log/', 'vendor/ruby',
+      \ '.idea/', 'dist/',
+      \ 'tags', 'tags-*'])
+
+nnoremap <c-p> :Denite buffer file_rec<cr>
