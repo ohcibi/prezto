@@ -1,3 +1,6 @@
+# fallback prompt if the rest cannot be loaded properly:
+export PS1="%n@%m %20<...<%d $ "
+
 #
 # Executes commands at the start of an interactive session.
 #
