@@ -51,3 +51,10 @@ alias :e="f -e vim -f -i"
 
 #gittower
 alias t="gittower ."
+
+#grep
+alias -g G=grep
+alias -g Gv='grep -v'
+
+#ps
+alias psx='ps aux'
