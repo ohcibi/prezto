@@ -55,6 +55,10 @@ function prompt_ohcibi_preexec {
   print -Pn "\a"
 }
 
+function is-discharging {
+  pmset -g batt | fgrep -Fq "discharging"
+}
+
 function prompt_ohcibi_precmd {
   vcs_info
   git-info
@@ -84,6 +88,11 @@ function prompt_ohcibi_precmd {
 
   # reset value since `preexec` isn't always triggered
   unset cmd_timestamp
+
+  psvar[1]=""
+  if is-discharging; then
+    psvar[1]=" $(battery-percentage)🔋"
+  fi
 }
 
 function prompt_ohcibi_setup {
@@ -160,9 +169,11 @@ function prompt_ohcibi_setup {
   zstyle ':prezto:module:node:info:version' format ' %F{070}node-%v%f'
 
   # Define prompts.
+  # note to self: if ever a string is needed in the prompt, define it in precmd instead of trying
+  # to append it right here
   PROMPT='${editor_info[keymap]}'"${path_color}%B "'${vcs_info_msg_1_}'"%${max_path_chars}<...<"'${vcs_info_msg_0_%%.}'"%<<%b%f"'${git_info[prompt]}''${ruby_info[version]}${node_info[version]}'${editor_info[insert]}${editor_info[keymap]}${editor_info[overwrite]}${VIM:+" %B%F{green}V%f%b"}"
 "'${exec_time[cmd]}''${exec_time[elapsed]}'"${prompt_color}%B%(!.${root_char}.${user_char})%b%f%_ "
-  RPROMPT='${git_info[rprompt]}%B%F{052}[%F{022}%*%f%F{052}]%f%b${python_info[virtualenv]}'
+  RPROMPT='${git_info[rprompt]}%B%F{052}[%F{022}%*%f%F{052}]%f%b${python_info[virtualenv]}'${prompt_color}'%1v'
   SPROMPT="zsh: correct %F{red}%R%f to %F{green}%r%f [nyae]? "
 }
 
