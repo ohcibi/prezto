@@ -77,4 +77,9 @@ fi
 # Temporary Files
 #
 
-TMPPREFIX="$(mktemp -d)/zsh"
+if [[ ! -d "$TMPDIR" ]]; then
+  export TMPDIR="/tmp/$LOGNAME"
+  mkdir -p -m 700 "$TMPDIR"
+fi
+
+TMPPREFIX="${TMPDIR%/}/zsh"
