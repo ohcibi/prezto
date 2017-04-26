@@ -58,3 +58,10 @@ alias -g Gv='grep -v'
 
 #ps
 alias psx='ps aux'
+
+#brew
+alias bubu='brew update && brew upgrade'
+alias bubi='brew update && brew install'
+
+#quicklook
+alias q='qlmanage -p 2>/dev/null'
