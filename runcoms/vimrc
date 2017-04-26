@@ -173,17 +173,31 @@ noremap <leader>m :QuickRun markdown<cr>
 set mouse=a
 set backup
 set undofile                "so is persistent undo ...
-set undodir=$HOME/.vim/undo//
 set undolevels=1000         "maximum number of changes that can be undone
 set undoreload=10000        "maximum number lines to save for undo on a buffer reload
-set backupdir=$HOME/.vim/backup//
-set directory=$HOME/.vim/swap//
-set viewdir=$HOME/.vim/views//
 
-silent execute '!mkdir -p $HOME/.vim/backup'
-silent execute '!mkdir -p $HOME/.vim/swap'
-silent execute '!mkdir -p $HOME/.vim/views'
-silent execute '!mkdir -p $HOME/.vim/undo'
+if has('nvim')
+  set undodir=$HOME/.nvim/undo//
+  set backupdir=$HOME/.nvim/backup//
+  set directory=$HOME/.nvim/swap//
+  set viewdir=$HOME/.nvim/views//
+
+  silent execute '!mkdir -p $HOME/.nvim/backup'
+  silent execute '!mkdir -p $HOME/.nvim/swap'
+  silent execute '!mkdir -p $HOME/.nvim/views'
+  silent execute '!mkdir -p $HOME/.nvim/undo'
+else
+  set undodir=$HOME/.vim/undo//
+  set backupdir=$HOME/.vim/backup//
+  set directory=$HOME/.vim/swap//
+  set viewdir=$HOME/.vim/views//
+
+  silent execute '!mkdir -p $HOME/.vim/backup'
+  silent execute '!mkdir -p $HOME/.vim/swap'
+  silent execute '!mkdir -p $HOME/.vim/views'
+  silent execute '!mkdir -p $HOME/.vim/undo'
+endif
+
 au BufWinLeave * silent! mkview
 au BufWinEnter * silent! loadview
 
@@ -333,8 +347,28 @@ call denite#custom#filter('matcher_ignore_globs', 'ignore_globs',
       \ [ '*~', '*.o', '*.exe', '*.bak',
       \ '.DS_Store', '*.pyc', '*.sw[po]', '*.class',
       \ '.hg/', '.git/', '.bzr/', '.svn/',
-      \ 'node_modules/', 'bower_components/', 'tmp/', 'log/', 'vendor/ruby',
       \ '.idea/', 'dist/',
       \ 'tags', 'tags-*'])
+      "\ 'node_modules/', 'bower_components/', 'tmp/', 'log/', 'vendor/ruby',
 
 nnoremap <c-p> :Denite buffer file_rec<cr>
+
+" vim-json
+let g:vim_json_comments=1
+
+" deoplete
+if has('nvim')
+  call deoplete#enable()
+  let g:deoplete#omni_patterns.javascript = '[^. *\t]\.\w*'
+  let g:deoplete#omni#functions.javascript = [ 'tern#Complete ']
+
+  let g:deoplete#file#enable_buffer_path = 1
+
+  set cot=menuone,noinsert
+endif
+
+let g:tern_request_timeout = 1
+let g:tern_show_signature_in_pnum = '0'
+
+let g:tern#command = ["tern"]
+let g:tern#arguments = ["--persistent"]
