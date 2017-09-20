@@ -43,3 +43,9 @@ add-zsh-hook chpwd load-nvmrc
 bindkey '' autosuggest-accept
 
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+
+test -e /usr/local/share/zsh/site-functions/git-flow-completion.zsh && source /usr/local/share/zsh/site-functions/git-flow-completion.zsh
+
+projects() {
+  cd $HOME/Documents/Projekte
+}

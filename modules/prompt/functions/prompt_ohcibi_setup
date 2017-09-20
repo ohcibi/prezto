@@ -91,7 +91,10 @@ function prompt_ohcibi_precmd {
 
   psvar[1]=""
   if is-discharging; then
-    psvar[1]=" $(battery-percentage)🔋"
+    #psvar[1]=" $(battery-percentage)"
+    psvar[1]=" $(battery-percentage) 🔋"
+  else
+    psvar[1]=" 🔌"
   fi
 }
 
@@ -158,7 +161,7 @@ function prompt_ohcibi_setup {
     'prompt' ' %p%b@%c' \
     'rprompt' '%A%B%S%s%a%d%m%r%U%u '
 
-  zstyle ':prezto:module:ruby:info:version' format " ${ruby_color}%v%f"
+  zstyle ':prezto:module:ruby:info:version' format " ${ruby_color}💎-%v%f"
 
   zstyle ':prezto:module:exec_time:elapsed_format' format "%F{yellow}%t%f "
   #zstyle ':prezto:module:exec_time:cmd_for:mat' format "%F{green}\`%c\`:%f "
@@ -166,7 +169,7 @@ function prompt_ohcibi_setup {
 
   zstyle ':prezto:module:python:info:virtualenv' format " %F{094}(%v)%f"
 
-  zstyle ':prezto:module:node:info:version' format ' %F{070}node-%v%f'
+  zstyle ':prezto:module:node:info:version' format ' %F{070}🔮-%v%f'
 
   # Define prompts.
   # note to self: if ever a string is needed in the prompt, define it in precmd instead of trying
