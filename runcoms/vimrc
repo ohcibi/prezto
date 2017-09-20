@@ -81,6 +81,7 @@ set modeline
 set backspace=indent,eol,start
 
 set foldmethod=indent
+set foldcolumn=2
 
 " tabs
 set tabstop=2
@@ -139,8 +140,23 @@ map <leader>a :A<cr>
 noremap <leader>r :!bundle exec rspec %<cr>
 nmap <leader>R :!bundle exec rspec spec<CR>
 
-map <leader>f :Autoformat<cr>
+map <leader>f <Plug>(ale_fix)
 
+if has('nvim')
+  tnoremap <C-space> <C-\><C-N>
+  tnoremap <C-h> <C-\><C-N><C-w>h
+  tnoremap <C-j> <C-\><C-N><C-w>j
+  tnoremap <C-k> <C-\><C-N><C-w>k
+  tnoremap <C-l> <C-\><C-N><C-w>l
+  inoremap <C-h> <C-\><C-N><C-w>h
+  inoremap <C-j> <C-\><C-N><C-w>j
+  inoremap <C-k> <C-\><C-N><C-w>k
+  inoremap <C-l> <C-\><C-N><C-w>l
+  nnoremap <C-h> <C-w>h
+  nnoremap <C-j> <C-w>j
+  nnoremap <C-k> <C-w>k
+  nnoremap <C-l> <C-w>l
+endif
 
 " Tabularize
 
@@ -240,6 +256,8 @@ let g:rainbow_conf = {
 \       'vim': {
 \           'parentheses': ['start=/(/ end=/)/', 'start=/\[/ end=/\]/', 'start=/{/ end=/}/ fold', 'start=/(/ end=/)/ containedin=vimFuncBody', 'start=/\[/ end=/\]/ containedin=vimFuncBody', 'start=/{/ end=/}/ fold containedin=vimFuncBody'],
 \       },
+\       'handlebars': 0,
+\       'html.handlebars': 0,
 \       'html': 0,
 \       'css': 0,
 \   }
@@ -319,7 +337,6 @@ let g:airline#extensions#default#section_truncate_width = {
 let g:syntastic_coffee_checkers = ['coffee', 'coffeelint']
 let g:syntastic_javascript_checkers = ['jshint', 'eslint']
 let g:syntastic_always_populate_loc_list = 1
-let g:syntastic_filetype_map = { 'html.handlebars': 'handlebars' }
 "let g:syntastic_javscript_eslint_exec = '/Users/ohcibi/.nvm/versions/node/v0.12.7/bin/eslint'
 
 function! RemoveC()
@@ -359,7 +376,7 @@ let g:vim_json_comments=1
 " deoplete
 if has('nvim')
   call deoplete#enable()
-  let g:deoplete#omni_patterns.javascript = '[^. *\t]\.\w*'
+  let g:deoplete#omni_patterns.javascript = '[^. *\t](=|\.)?\w*'
   let g:deoplete#omni#functions.javascript = [ 'tern#Complete ']
 
   let g:deoplete#file#enable_buffer_path = 1
@@ -372,3 +389,50 @@ let g:tern_show_signature_in_pnum = '0'
 
 let g:tern#command = ["tern"]
 let g:tern#arguments = ["--persistent"]
+
+set diffopt+=vertical
+
+
+" ale
+let g:ale_sign_error = '✘'
+let g:ale_sign_warning = '﹅'
+let g:ale_fixers = {
+      \ 'javascript': ['eslint']
+      \ }
+let g:ale_javascript_eslint_options = "--no-ignore"
+let g:ale_typescript_tslint_options = "--no-ignore"
+let g:ale_typescript_tslint_executable = "tslint --project tsconfig.json"
+let g:ale_html_tidy_options = "-config .tidyrc"
+hi ALEErrorSign ctermfg=darkred
+hi ALEWarningSign ctermfg=darkyellow
+
+" virtualenv
+"let g:python3_host_prog='/Users/ohcibi/.pyenv/py3neovim/bin/python'
+
+let g:UltiSnipsSnippetDirectories=["UltiSnips"]
+
+" prettier
+let g:prettier#config#single_quote = 'false'
+let g:prettier#config#print_width = 100
+let g:prettier#config#trailing_comma = 'none'
+let g:prettier#config#bracket_spacing = 'true'
+
+" terminal
+if has('nvim')
+    autocmd TermOpen * setlocal statusline=%{getcwd()}
+    autocmd TermOpen * set relativenumber
+    autocmd TermOpen * set foldcolumn=0
+endif
+
+command -nargs=* Ng e term://ng <args>
+command -nargs=* -complete=custom,ListNgServeOpts NgServe e term://ng serve <args>
+command -nargs=+ -complete=custom,ListNgGenerateCommands NgGenerate e term://ng generate <args>
+
+fun ListNgServeOpts(ArgLead, CmdLine, CursorPos)
+  return "--port "
+endfun
+
+fun ListNgGenerateCommands(ArgLead, CmdLine, CursorPos)
+  return system('ng help generate | grep "[a-z]\+ <name" | sed -e "s/^[ \t]*//" | cut -f 1 -d " "')
+endfun
+
