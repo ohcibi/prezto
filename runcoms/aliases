@@ -65,3 +65,12 @@ alias bubi='brew update && brew install'
 
 #quicklook
 alias q='qlmanage -p 2>/dev/null'
+
+#vim
+if [ -z $NVIM_LISTEN_ADDRESS ]; then
+  alias vim='NVIM_LISTEN_ADDRESS=/tmp/nvimsocket nvim'
+  alias nvim='NVIM_LISTEN_ADDRESS=/tmp/nvimsocket nvim'
+else
+  alias vim='nvr'
+  alias nvim='nvr'
+fi

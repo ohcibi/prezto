@@ -1,36 +1,3 @@
-" set nocompatible
-" filetype off
-"
-" "NeoBundle Scripts-----------------------------
-" if has('vim_starting')
-"   if &compatible
-"     set nocompatible               " Be iMproved
-"   endif
-"
-"   " Required:
-"   set runtimepath+=$HOME/.vim/bundle/neobundle.vim/
-" endif
-"
-" " Required:
-" call neobundle#begin(expand('$HOME/.vim/bundle'))
-"
-" " Let NeoBundle manage NeoBundle
-" " Required:
-" NeoBundleFetch 'Shougo/neobundle.vim'
-"
-" source $HOME/.vim/bundlerc.vim
-"
-" " Required:
-" call neobundle#end()
-"
-" " Required:
-" filetype plugin indent on
-"
-" " If there are uninstalled bundles found on startup,
-" " this will conveniently prompt you to install them.
-" NeoBundleCheck
-" "End NeoBundle Scripts-------------------------
-"dein Scripts-----------------------------
 if &compatible
   set nocompatible               " Be iMproved
 endif
@@ -39,16 +6,19 @@ endif
 set runtimepath^=~/.vim/dein/repos/github.com/Shougo/dein.vim
 
 " Required:
-call dein#begin(expand('~/.vim/dein'))
+if dein#load_state(expand('~/.vim/dein/'))
+  call dein#begin(expand('~/.vim/dein'))
 
-" Let dein manage dein
-" Required:
-call dein#add('Shougo/dein.vim')
+  " Let dein manage dein
+  " Required:
+  call dein#add(expand('~/.vim/dein/repos/github.com/Shougo/dein.vim'))
 
-source $HOME/.vim/bundlerc.vim
+  source $HOME/.vim/bundlerc.vim
 
-" Required:
-call dein#end()
+  " Required:
+  call dein#end()
+  call dein#save_state()
+endif
 
 " Required:
 filetype plugin indent on
@@ -66,9 +36,6 @@ set grepprg="grep -nH $*"
 
 let mapleader=","
 let maplocalleader=','
-
-runtime! vimrc.d/**.vim
-runtime! vimrc.local.d/**.vim
 
 " basic
 set number
@@ -142,6 +109,9 @@ nmap <leader>R :!bundle exec rspec spec<CR>
 
 map <leader>f <Plug>(ale_fix)
 
+nnoremap <leader>y "+yy
+vnoremap <leader>y "+y
+
 if has('nvim')
   tnoremap <C-space> <C-\><C-N>
   tnoremap <C-h> <C-\><C-N><C-w>h
@@ -156,29 +126,36 @@ if has('nvim')
   nnoremap <C-j> <C-w>j
   nnoremap <C-k> <C-w>k
   nnoremap <C-l> <C-w>l
+
+  nnoremap <c-t> :terminal<cr>
 endif
 
 " Tabularize
 
-vmap gt        :Tabularize /
-vmap gt=       :Tabularize /=<cr>
-vmap gt&       :Tabularize /&<cr>
-vmap gt.       :Tabularize /.<cr>
-vmap gt:       :Tabularize /:<cr>
-vmap gt,       :Tabularize /,<cr>
-vmap gt;       :Tabularize /;<cr>
-vmap gt<space> :Tabularize / <cr>
+vmap <leader>tab        :Tabularize /
+vmap <leader>tab=       :Tabularize /=<cr>
+vmap <leader>tab&       :Tabularize /&<cr>
+vmap <leader>tab.       :Tabularize /.<cr>
+vmap <leader>tab:       :Tabularize /:<cr>
+vmap <leader>tab,       :Tabularize /,<cr>
+vmap <leader>tab;       :Tabularize /;<cr>
 
-" Buffers
-map gl :ls<cr>
+" Buffers and files
+nnoremap gb :ls<cr>:b
+nnoremap gbd :ls<cr>:bd
+nnoremap gbs :Denite buffer<cr>
+nnoremap <c-b> :Denite buffer<cr>
+nnoremap <c-p> :Denite buffer file_rec<cr>
+nnoremap gf :Denite file_rec<cr>
+nnoremap gfb :Denite buffer file_rec<cr>
+
+nnoremap gs :split<cr>
+nnoremap gsv :vsplit<cr>
 
 " show highlighting group under cursor when pressing F10
 map <F10> :echo "hi<" . synIDattr(synID(line("."),col("."),1),"name") . '> trans<'
 \ . synIDattr(synID(line("."),col("."),0),"name") . "> lo<"
 \ . synIDattr(synIDtrans(synID(line("."),col("."),1)),"name") . ">"<CR>
-
-" CTRLP
-noremap <c-b> :CtrlPBuffer<cr>
 
 "convenience
 noremap <leader><cr> :nohlsearch<cr>
@@ -236,7 +213,7 @@ if has('conceal')
   set conceallevel=1 concealcursor=i
 endif
 
-let g:SuperTabDefaultCompletionType = "<c-n>"
+let g:SuperTabDefaultCompletionType = "<c-x><c-o>"
 
 " rainbow paranthesis
 let g:rainbow_active = 1
@@ -313,7 +290,6 @@ let g:quickrun_config = {
 let g:airline_powerline_fonts = 1
 let g:airline#extensions#bufferline#overwrite_variables = 0
 let g:airline#extensions#tmuxline#enabled = 0
-let g:airline#extensions#tabline#enabled = 1
 let g:bufferline_rotate = 1
 let g:bufferline_fixed_index = -1
 let g:bufferline_active_buffer_left = '['
@@ -355,11 +331,9 @@ set wildmenu
 
 set colorcolumn=100
 
-let g:UltiSnipsUsePythonVersion=3
-
 call denite#custom#var('file_rec', 'command',
   \ ['ag', '--follow', '--nocolor', '--nogroup', '-g', ''])
-call denite#custom#source('file_rec', 'matchers', ['matcher_fuzzy', 'matcher_ignore_globs'])
+call denite#custom#source('file_rec', 'matchers', ['matcher_cpsm', 'matcher_ignore_globs'])
 call denite#custom#filter('matcher_ignore_globs', 'ignore_globs',
       \ [ '*~', '*.o', '*.exe', '*.bak',
       \ '.DS_Store', '*.pyc', '*.sw[po]', '*.class',
@@ -368,20 +342,31 @@ call denite#custom#filter('matcher_ignore_globs', 'ignore_globs',
       \ 'tags', 'tags-*'])
       "\ 'node_modules/', 'bower_components/', 'tmp/', 'log/', 'vendor/ruby',
 
-nnoremap <c-p> :Denite buffer file_rec<cr>
-
 " vim-json
 let g:vim_json_comments=1
 
 " deoplete
 if has('nvim')
-  call deoplete#enable()
+  let g:deoplete#enable_at_startup = 1
+  let g:deoplete#enable_smart_case = 1
+
+  if !exists('g:deoplete#omni_patterns')
+    let g:deoplete#omni_patterns = {}
+  endif
   let g:deoplete#omni_patterns.javascript = '[^. *\t](=|\.)?\w*'
-  let g:deoplete#omni#functions.javascript = [ 'tern#Complete ']
+  if !exists('g:deoplete#omni#functions')
+    let g:deoplete#omni#functions = {}
+  endif
+  let g:deoplete#omni#functions.javascript = [
+\   'tern#Complete'
+\ ]
+
+  let g:deoplete#sources = {}
+  let g:deoplete#sources['javascript.jsx'] = ['file', 'ultisnips', 'ternjs']
 
   let g:deoplete#file#enable_buffer_path = 1
 
-  set cot=menuone,noinsert
+  set cot=longest,menuone,preview
 endif
 
 let g:tern_request_timeout = 1
@@ -391,20 +376,6 @@ let g:tern#command = ["tern"]
 let g:tern#arguments = ["--persistent"]
 
 set diffopt+=vertical
-
-
-" ale
-let g:ale_sign_error = '✘'
-let g:ale_sign_warning = '﹅'
-let g:ale_fixers = {
-      \ 'javascript': ['eslint']
-      \ }
-let g:ale_javascript_eslint_options = "--no-ignore"
-let g:ale_typescript_tslint_options = "--no-ignore"
-let g:ale_typescript_tslint_executable = "tslint --project tsconfig.json"
-let g:ale_html_tidy_options = "-config .tidyrc"
-hi ALEErrorSign ctermfg=darkred
-hi ALEWarningSign ctermfg=darkyellow
 
 " virtualenv
 "let g:python3_host_prog='/Users/ohcibi/.pyenv/py3neovim/bin/python'
@@ -422,6 +393,8 @@ if has('nvim')
     autocmd TermOpen * setlocal statusline=%{getcwd()}
     autocmd TermOpen * set relativenumber
     autocmd TermOpen * set foldcolumn=0
+
+    nnoremap <leader>t :e term://
 endif
 
 command -nargs=* Ng e term://ng <args>
@@ -436,3 +409,10 @@ fun ListNgGenerateCommands(ArgLead, CmdLine, CursorPos)
   return system('ng help generate | grep "[a-z]\+ <name" | sed -e "s/^[ \t]*//" | cut -f 1 -d " "')
 endfun
 
+
+set inccommand=nosplit
+
+set guicursor=n-v-c-sm:block,i-ci-ve:ver25-blinkon100,r-cr-o:hor20
+
+runtime! vimrc.d/**.vim
+runtime! vimrc.local.d/**.vim

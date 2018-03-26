@@ -23,7 +23,8 @@ PROJECT_HOME=$HOME/Documents/Projekte
 source /usr/local/bin/virtualenvwrapper.sh
 
 doge
-export VISUAL=vim
+export VISUAL=nvim
+export EDITOR=nvim
 export PYTHONSTARTUP=$HOME/.pythonrc
 
 source ~/.zshrc.local
@@ -49,3 +50,15 @@ test -e /usr/local/share/zsh/site-functions/git-flow-completion.zsh && source /u
 projects() {
   cd $HOME/Documents/Projekte
 }
+
+if [[ -n $ITERM_PROFILE && $ITERM_PROFILE = "Hotkey Window" ]]; then
+  export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=242'
+fi
+
+ZSH_HIGHLIGHT_STYLES[cursor]='bg=blue'
+
+source /usr/local/share/zsh/site-functions/_tmuxinator
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
+
