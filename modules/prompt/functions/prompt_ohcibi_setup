@@ -89,13 +89,81 @@ function prompt_ohcibi_precmd {
   # reset value since `preexec` isn't always triggered
   unset cmd_timestamp
 
-  psvar[1]=""
-  if is-discharging; then
-    #psvar[1]=" $(battery-percentage)"
-    psvar[1]=" $(battery-percentage) 🔋"
-  else
-    psvar[1]=" 🔌"
+  # battery state
+  local perc=$(battery-percentage)
+  local batteryps
+  if is-discharging || ! [ $perc = "100%" ]; then
+    batteryps=" $perc"
   fi
+
+  if [ -z $NVIM_LISTEN_ADDRESS ]; then
+    if is-discharging; then
+      batteryps="${batteryps} 🔋"
+    else
+      batteryps="${batteryps} 🔌"
+    fi
+  fi
+
+  psvar[1]=$batteryps
+
+  # weather
+  local -A symbols=(
+    Sunny "☀️ "
+    # TODO:
+    "Clear" "☀️ "
+    "Sunny" "☀️ "
+    "Partly cloudy" "🌤 "
+    "Cloudy" "☁️ "
+    "Overcast" "🌥 "
+    "Mist" "🌫 "
+    "Patchy rain possible" "🌧 "
+    # "Patchy snow possible"
+    # "Patchy sleet possible"
+    # "Patchy freezing drizzle possible"
+    # "Thundery outbreaks possible"
+    # "Blowing snow"
+    # "Blizzard"
+    "Fog" "🌫 "
+    # "Freezing fog"
+    # "Patchy light drizzle"
+    "Light drizzle" "🌧 "
+    # "Freezing drizzle"
+    # "Heavy freezing drizzle"
+    # "Patchy light rain"
+    "Light Rain" "🌦 "
+    "Light rain" "🌦 "
+    # "Moderate rain at times"
+    # "Moderate rain"
+    # "Heavy rain at times"
+    # "Heavy rain"
+    # "Light freezing rain"
+    # "Moderate or heavy freezing rain"
+    # "Light sleet"
+    # "Moderate or heavy sleet"
+    # "Patchy light snow"
+    # "Light snow"
+    # "Patchy moderate snow"
+    # "Moderate snow"
+    # "Patchy heavy snow"
+    # "Heavy snow"
+    # "Ice pellets"
+    "Light rain shower" "🌧 "
+    "Rain Shower" "🌧 "
+    # "Moderate or heavy rain shower"
+    # "Torrential rain shower"
+    # "Light sleet showers"
+    # "Moderate or heavy sleet showers"
+    # "Light snow showers"
+    # "Moderate or heavy snow showers"
+    # "Patchy light rain with thunder"
+    # "Moderate or heavy rain with thunder"
+    # "Patchy light snow with thunder"
+    # "Moderate or heavy snow with thunder"
+  )
+  weatherstr=$(curl -s wttr.in/"?TQ0" | sed -n '1,2p' | cut -c 16-)
+  weather=("${(f)weatherstr}")
+  (( ${+symbols[$weather[1]]} )) && weather[1]=$symbols[$weather[1]]
+  psvar[2]="$weather[1] $weather[2] $weather[3]"
 }
 
 function prompt_ohcibi_setup {
@@ -161,7 +229,7 @@ function prompt_ohcibi_setup {
     'prompt' ' %p%b@%c' \
     'rprompt' '%A%B%S%s%a%d%m%r%U%u '
 
-  zstyle ':prezto:module:ruby:info:version' format " ${ruby_color}💎-%v%f"
+  zstyle ':prezto:module:ruby:info:version' format "💎${ruby_color}-%v %f"
 
   zstyle ':prezto:module:exec_time:elapsed_format' format "%F{yellow}%t%f "
   #zstyle ':prezto:module:exec_time:cmd_for:mat' format "%F{green}\`%c\`:%f "
@@ -169,14 +237,18 @@ function prompt_ohcibi_setup {
 
   zstyle ':prezto:module:python:info:virtualenv' format " %F{094}(%v)%f"
 
-  zstyle ':prezto:module:node:info:version' format ' %F{070}🔮-%v%f'
+  zstyle ':prezto:module:node:info:version' format "🔮%F{070}-%v  %f"
 
   # Define prompts.
   # note to self: if ever a string is needed in the prompt, define it in precmd instead of trying
   # to append it right here
-  PROMPT='${editor_info[keymap]}'"${path_color}%B "'${vcs_info_msg_1_}'"%${max_path_chars}<...<"'${vcs_info_msg_0_%%.}'"%<<%b%f"'${git_info[prompt]}''${ruby_info[version]}${node_info[version]}'${editor_info[insert]}${editor_info[keymap]}${editor_info[overwrite]}${VIM:+" %B%F{green}V%f%b"}"
+  PROMPT='${editor_info[keymap]}'"${path_color}%B "'${vcs_info_msg_1_}'"%${max_path_chars}<...<"'${vcs_info_msg_0_%%.}'"%<<%b%f"'${git_info[prompt]} ${ruby_info[version]}${node_info[version]}'"%2v
 "'${exec_time[cmd]}''${exec_time[elapsed]}'"${prompt_color}%B%(!.${root_char}.${user_char})%b%f%_ "
-  RPROMPT='${git_info[rprompt]}%B%F{052}[%F{022}%*%f%F{052}]%f%b${python_info[virtualenv]}%B%1v%b'
+  if [[ -n $ITERM_PROFILE && $ITERM_PROFILE = "Hotkey Window" ]]; then
+    RPROMPT='${git_info[rprompt]}%B%F{249}[%F{120}%*%f%F{249}]%f%b${python_info[virtualenv]}%B%1v%b'
+  else
+    RPROMPT='${git_info[rprompt]}%B%F{052}[%F{022}%*%f%F{052}]%f%b${python_info[virtualenv]}%B%1v%b'
+  fi
   SPROMPT="zsh: correct %F{red}%R%f to %F{green}%r%f [nyae]? "
 }
 
