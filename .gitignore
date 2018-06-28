@@ -11,4 +11,5 @@ vim/.netrwhist
 
 vim/spell
 vim/dein
+vim/vimrc.local.d
 
