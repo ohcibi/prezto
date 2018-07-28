@@ -1,2 +1,0 @@
-hi link javascriptAwaitFuncKeyword Keyword
-hi link javascriptAsyncFuncKeyword Keyword
