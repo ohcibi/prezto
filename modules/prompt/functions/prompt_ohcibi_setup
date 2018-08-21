@@ -64,7 +64,6 @@ function prompt_ohcibi_precmd {
   git-info
   ruby-info
   python-info
-  node-info
 
   unset exec_time
   typeset -gA exec_time
@@ -90,26 +89,88 @@ function prompt_ohcibi_precmd {
   unset cmd_timestamp
 
   # battery state
-  local perc=$(battery-percentage)
+  typeset -gA battery_info
+  local perc=${$(battery-percentage)/\%/%%}
+  local perc_value=`echo $perc | sed -e 's/%//g'`
   local batteryps
-  if is-discharging || ! [ $perc = "100%" ]; then
-    batteryps=" $perc"
+  if is-discharging || ! [ $perc_value = 100 ]; then
+    batteryps="$perc"
   fi
 
-  if [ -z $NVIM_LISTEN_ADDRESS ]; then
-    if is-discharging; then
-      batteryps="${batteryps} 🔋"
+  local c=(    # percentage colors
+    "%F{160}"  # red
+    "%F{166}"  # orange
+    "%F{172}"  # dark yellow
+    "%F{178}"  # yellow
+    "%F{184}"  # dark green
+    "%F{190}"  # yellow green
+    "%F{118}") # green
+
+  local ic=(   # icon colors
+    "%F{161}%B"  # red
+    "%F{167}%B"  # orange
+    "%F{173}%B"  # dark yellow
+    "%F{179}%B"  # yellow
+    "%F{185}%B"  # dark green
+    "%F{191}%B"  # yellow green
+    "%F{119}%B") # green
+
+  if is-discharging; then
+    if [ $perc_value -lt 10 ]; then
+      batteryps="${ic[1]}%b%f ${c[1]}${batteryps}%f"
+    elif [ $perc_value -lt 20 ]; then
+      batteryps="${ic[1]}%b%f ${c[1]}${batteryps}%f" # f579
+    elif [ $perc_value -lt 30 ]; then
+      batteryps="${ic[2]}%b%f ${c[2]}${batteryps}%f" # f57a
+    elif [ $perc_value -lt 40 ]; then
+      batteryps="${ic[2]}%b%f ${c[2]}${batteryps}%f" # f57b
+    elif [ $perc_value -lt 50 ]; then
+      batteryps="${ic[3]}%b%f ${c[3]}${batteryps}%f" # f57c
+    elif [ $perc_value -lt 60 ]; then
+      batteryps="${ic[3]}%b%f ${c[3]}${batteryps}%f" # f57d
+    elif [ $perc_value -lt 70 ]; then
+      batteryps="${ic[4]}%b%f ${c[4]}${batteryps}%f" # f57e
+    elif [ $perc_value -lt 80 ]; then
+      batteryps="${ic[4]}%b%f ${c[4]}${batteryps}%f" # f57f
+    elif [ $perc_value -lt 90 ]; then
+      batteryps="${ic[5]}%b%f ${c[5]}${batteryps}%f" # f580
+    elif [ $perc_value -lt 100 ]; then
+      batteryps="${ic[6]}%b%f ${c[6]}${batteryps}%f" # f581
     else
-      batteryps="${batteryps} 🔌"
+      batteryps="${ic[7]}%b%f ${c[7]}${batteryps}%f" # f578
+    fi
+  else
+    if [ $perc_value -lt 30 ]; then
+      batteryps="${ic[1]}%b%f ${c[1]}${batteryps}%f" # f585
+    elif [ $perc_value -lt 40 ]; then
+      batteryps="${ic[2]}%b%f ${c[2]}${batteryps}%f" # f586
+    elif [ $perc_value -lt 60 ]; then
+      batteryps="${ic[3]}%b%f ${c[3]}${batteryps}%f" # f587
+    elif [ $perc_value -lt 80 ]; then
+      batteryps="${ic[4]}%b%f ${c[4]}${batteryps}%f" # f588
+    elif [ $perc_value -lt 90 ]; then
+      batteryps="${ic[5]}%b%f ${c[5]}${batteryps}%f" # f589
+    elif [ $perc_value -lt 100 ]; then
+      batteryps="${ic[6]}%b%f ${c[6]}${batteryps}%f" # f58a
+    else
+      batteryps="${ic[7]}ﮣ%b%f"              # fba3
     fi
   fi
 
-  psvar[1]=$batteryps
+  battery_info[rprompt]=$batteryps
 
-  # weather
+  unset node_info # hack: see arender callback
+  unset weather_info
+  typeset -gA weather_info
+  async_job my_worker prompt_ohcibi_weather_check
+
+  render_prompt
+}
+
+# weather
+function prompt_ohcibi_weather_check() {
   local -A symbols=(
     Sunny "☀️ "
-    # TODO:
     "Clear" "☀️ "
     "Sunny" "☀️ "
     "Partly cloudy" "🌤 "
@@ -117,21 +178,24 @@ function prompt_ohcibi_precmd {
     "Overcast" "🌥 "
     "Mist" "🌫 "
     "Patchy rain possible" "🌧 "
+    "Fog" "🌫 "
+    "Light drizzle" "🌧 "
+    "Light Rain" "🌦 "
+    "Light rain" "🌦 "
+    "Light rain shower" "🌧 "
+    "Rain Shower" "🌧 "
+    # TODO:
     # "Patchy snow possible"
     # "Patchy sleet possible"
     # "Patchy freezing drizzle possible"
     # "Thundery outbreaks possible"
     # "Blowing snow"
     # "Blizzard"
-    "Fog" "🌫 "
     # "Freezing fog"
     # "Patchy light drizzle"
-    "Light drizzle" "🌧 "
     # "Freezing drizzle"
     # "Heavy freezing drizzle"
     # "Patchy light rain"
-    "Light Rain" "🌦 "
-    "Light rain" "🌦 "
     # "Moderate rain at times"
     # "Moderate rain"
     # "Heavy rain at times"
@@ -147,8 +211,6 @@ function prompt_ohcibi_precmd {
     # "Patchy heavy snow"
     # "Heavy snow"
     # "Ice pellets"
-    "Light rain shower" "🌧 "
-    "Rain Shower" "🌧 "
     # "Moderate or heavy rain shower"
     # "Torrential rain shower"
     # "Light sleet showers"
@@ -160,10 +222,12 @@ function prompt_ohcibi_precmd {
     # "Patchy light snow with thunder"
     # "Moderate or heavy snow with thunder"
   )
-  weatherstr=$(curl -s wttr.in/"?TQ0" | sed -n '1,2p' | cut -c 16-)
+
+  local weatherstr
+  weatherstr=$(curl -s wttr.in/Düsseldorf"?TQ0" | sed -n '1,2p' | cut -c 16-)
   weather=("${(f)weatherstr}")
   (( ${+symbols[$weather[1]]} )) && weather[1]=$symbols[$weather[1]]
-  psvar[2]="$weather[1] $weather[2] $weather[3]"
+  echo "$weather[1] $weather[2] $weather[3]"
 }
 
 function prompt_ohcibi_setup {
@@ -181,19 +245,35 @@ function prompt_ohcibi_setup {
   autoload -Uz add-zsh-hook
   autoload -Uz vcs_info
 
+  autoload -Uz async && async
+  async_start_worker my_worker -n
+
+  arender() {
+    case $1 in
+      prompt_ohcibi_weather_check)
+        weather_info[prompt]=$3
+    esac
+    [[ -n $6 ]] && return
+
+    # hack: call node-info in this callback in order to make it a) async and b) inside the right environment
+    # plus we need to load node properly by calling node once because nvm 👰
+    (( $+commands[node] )) && node --version &> /dev/null && node-info
+
+    render_prompt
+    zle && zle .reset-prompt
+  }
+
+  async_register_callback my_worker arender
+
   add-zsh-hook precmd prompt_ohcibi_precmd
   add-zsh-hook preexec prompt_ohcibi_preexec
 
   # Customizable parameters.
-  local max_path_chars=30
-  local user_char='λ'
-  local root_char='G'
+  local path_color='%F{4}'
   local success_color='%F{071}'
   local failure_color='%F{124}'
   local vcs_info_color='%F{242}'
   local def_color='%F{3}'
-  local path_color='%F{4}'
-  local prompt_color='%F{9}'
   local user_color='%F{17}'
   local branch_color='%F{6}'
   local action_color='%F{23}'
@@ -204,7 +284,7 @@ function prompt_ohcibi_setup {
   # Set vcs_info parameters.
   zstyle ':vcs_info:*' enable bzr git hg svn
   zstyle ':vcs_info:*' actionformats "%S" "%F{5}(${action_color}%a%F{5})%f ${path_color}%r/${path_color}"
-  zstyle ':vcs_info:*' formats "%S" "${path_color}%r/"
+  zstyle ':vcs_info:*' formats "%S" "${path_color}%r"
   zstyle ':vcs_info:*' nvcsformats "%~" ""
 
   zstyle ':prezto:module:editor:info:completing' format '%B%F{red}...%f%b'
@@ -226,29 +306,84 @@ function prompt_ohcibi_setup {
   zstyle ':prezto:module:git:info:unmerged' format ' %%B%F{yellow}═%f%%b'
   zstyle ':prezto:module:git:info:untracked' format ' %%B%F{yellow}◼%f%%b'
   zstyle ':prezto:module:git:info:keys' format \
-    'prompt' ' %p%b@%c' \
+    'prompt' ' %p%b  %c' \
     'rprompt' '%A%B%S%s%a%d%m%r%U%u '
 
-  zstyle ':prezto:module:ruby:info:version' format "💎${ruby_color}-%v %f"
+  zstyle ':prezto:module:ruby:info:version' format "%F{red}%f ${ruby_color}%v%f"
 
-  zstyle ':prezto:module:exec_time:elapsed_format' format "%F{yellow}%t%f "
+  zstyle ':prezto:module:exec_time:elapsed_format' format "%F{yellow}%t%f"
   #zstyle ':prezto:module:exec_time:cmd_for:mat' format "%F{green}\`%c\`:%f "
   zstyle ':prezto:module:exec_time:cmd_format' format ""
 
-  zstyle ':prezto:module:python:info:virtualenv' format " %F{094}(%v)%f"
+  zstyle ':prezto:module:python:info:virtualenv' format "%F{094}%v%f"
 
-  zstyle ':prezto:module:node:info:version' format "🔮%F{070}-%v  %f"
+  zstyle ':prezto:module:node:info:version' format '%F{028}%f %F{070}%v%f'
+}
 
+render_prompt() {
+  local max_path_chars=30
+  local user_char='λ'
+  local root_char='G'
+  local prompt_color='%F{9}'
+  local path_color='%F{4}'
   # Define prompts.
   # note to self: if ever a string is needed in the prompt, define it in precmd instead of trying
   # to append it right here
-  PROMPT='${editor_info[keymap]}'"${path_color}%B "'${vcs_info_msg_1_}'"%${max_path_chars}<...<"'${vcs_info_msg_0_%%.}'"%<<%b%f"'${git_info[prompt]} ${ruby_info[version]}${node_info[version]}'"%2v
-"'${exec_time[cmd]}''${exec_time[elapsed]}'"${prompt_color}%B%(!.${root_char}.${user_char})%b%f%_ "
-  if [[ -n $ITERM_PROFILE && $ITERM_PROFILE = "Hotkey Window" ]]; then
-    RPROMPT='${git_info[rprompt]}%B%F{249}[%F{120}%*%f%F{249}]%f%b${python_info[virtualenv]}%B%1v%b'
-  else
-    RPROMPT='${git_info[rprompt]}%B%F{052}[%F{022}%*%f%F{052}]%f%b${python_info[virtualenv]}%B%1v%b'
+  local -a preprompt_parts
+  local -a prompt_parts
+
+  if [[ -z $prompt_newline ]]; then
+    # This variable needs to be set, usually set by promptinit.
+    typeset -g prompt_newline=$'\n%{\r%}'
   fi
+
+  preprompt_parts+=('${editor_info[keymap]}')
+  path_string=$path_color'%B${vcs_info_msg_1_:+${vcs_info_msg_1_}/}%b'$path_color'%'$max_path_chars'<...<${vcs_info_msg_0_%%.}%<<%b%f'
+
+  if [[ -n $vcs_info_msg_1_ ]]; then
+    path_string=" $path_string ${git_info[prompt]}"
+  fi
+
+  preprompt_parts+=("%K{015}%F{189}%f $path_string %F{189}%F%k")
+
+  local -a info_string_parts
+  [[ -n ${ruby_info[version]} ]]   && info_string_parts+=('${${ruby_info[version]}/-ruby/}')
+  [[ -n ${node_info[version]} ]]   && info_string_parts+=('${node_info[version]}')
+
+  preprompt_parts+=("%K{015}%F{189}%f ${(j. .)info_string_parts} %F{189}%F%k")
+
+  [[ -n ${weather_info[prompt]} ]] && preprompt_parts+=('${weather_info[prompt]}')
+
+  [[ -n ${exec_time[cmd]} ]] && prompt_parts+=('${exec_time[cmd]}')
+  [[ -n ${exec_time[elapsed]} ]] && prompt_parts+=('${exec_time[elapsed]}')
+  prompt_parts+=($prompt_color'%B%(!.'$root_char'.'$user_char')%f%b')
+
+  local -ah ps1
+  ps1=(
+    $prompt_newline
+    #'"'
+    ${(j. .)preprompt_parts}
+    #'"'
+    $prompt_newline
+    ${(j. .)prompt_parts}
+  )
+  PROMPT="${(j..)ps1} "
+
+  local -a rprompt_parts
+  [[ -n ${git_info[rprompt]} ]] && rprompt_parts+=('${git_info[rprompt]}')
+
+  [[ -n ${python_info[virtualenv]} ]] && rprompt_parts+=('%F{darkgreen}%f %B${python_info[virtualenv]}%b')
+
+  if [[ -n $ITERM_PROFILE && $ITERM_PROFILE = "Hotkey Window" ]]; then
+    rprompt_parts+=(' %B%F{120}%*%f%b')
+  else
+    rprompt_parts+=(' %B%F{022}%*%f%b')
+  fi
+
+  [[ -n ${battery_info[rprompt]} ]]   && rprompt_parts+=('%B${battery_info[rprompt]}%b')
+
+  RPROMPT="%K{015}%F{189}%f ${(j. .)rprompt_parts} %F{189}%f%k"
+
   SPROMPT="zsh: correct %F{red}%R%f to %F{green}%r%f [nyae]? "
 }
 
