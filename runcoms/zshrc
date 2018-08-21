@@ -18,14 +18,9 @@ bindkey "^R" history-incremental-search-backward
 
 source ~/.aliases
 
-WORKON_HOME=$HOME/.pyenv
-PROJECT_HOME=$HOME/Documents/Projekte
-source /usr/local/bin/virtualenvwrapper.sh
-
 doge
 export VISUAL=nvim
 export EDITOR=nvim
-export PYTHONSTARTUP=$HOME/.pythonrc
 
 source ~/.zshrc.local
 
@@ -57,8 +52,12 @@ fi
 
 ZSH_HIGHLIGHT_STYLES[cursor]='bg=blue'
 
-source /usr/local/share/zsh/site-functions/_tmuxinator
-
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
+WORKON_HOME=$HOME/.pyenv
+PROJECT_HOME=$HOME/Documents/Projekte
+source /usr/local/bin/virtualenvwrapper.sh
+
+[ -x $(which pipenv) ] && eval "$(pipenv --completion)"
