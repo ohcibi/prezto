@@ -358,7 +358,7 @@ function prompt_ohcibi_setup {
   zstyle ':prezto:module:ruby:info:version'                     format "%F{red}%f ${ruby_color}%v%f"
 
   zstyle ':prezto:module:exec_time:elapsed_format'              format "%F{yellow}%t%f"
-  zstyle ':prezto:module:exec_time:cmd_format'                  format ""
+  zstyle ':prezto:module:exec_time:cmd_format'                  format "%c"
 
   zstyle ':prezto:module:python:info:virtualenv'                format "%F{094}%v%f"
 
@@ -409,7 +409,7 @@ render_prompt() {
 
   [[ -n ${weather_info[prompt]} ]] && preprompt_parts+=('${weather_info[prompt]}')
 
-  [[ -n ${exec_time[cmd]} ]] && prompt_parts+=('${exec_time[cmd]}')
+  [[ -n ${exec_time[cmd]} ]] && prompt_parts+=('%20>...>${exec_time[cmd]}%<<')
   [[ -n ${exec_time[elapsed]} ]] && prompt_parts+=('${exec_time[elapsed]}')
   prompt_parts+=($prompt_color'%B%(!.'$root_char'.'$user_char')%f%b')
 
