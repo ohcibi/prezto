@@ -29,9 +29,6 @@ alias glf="git log --follow"
 # probcli
 alias probcli="rlwrap /Users/ohcibi/Applications/ProB/probcli -repl -p REPL_UNICODE TRUE -init"
 
-# mvim
-alias :e="mvim"
-
 #ember
 alias em=ember
 
@@ -47,7 +44,10 @@ alias fuck='eval $(thefuck $(fc -ln -1 | tail -n 1)); fc -R'
 
 #fasd
 alias f="fasd"
-alias :e="f -e vim -f -i"
+alias fe="f -e nvim -f -i"
+alias fd="f -e cd -d"
+alias fcat="f -e cat -f"
+alias fo="f -e open"
 
 #gittower
 alias t="gittower ."
