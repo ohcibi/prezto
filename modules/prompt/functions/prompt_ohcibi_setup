@@ -59,11 +59,57 @@ function is-discharging {
   pmset -g batt | fgrep -Fq "discharging"
 }
 
+function dir-info {
+  typeset -gA dir_info
+
+  typeset -AH dir_states
+  zstyle -s ':prezto:module:prompt:ohcibi:dir:state:icons:default' format 'dir_states[DEFAULT]'
+  zstyle -s ':prezto:module:prompt:ohcibi:dir:state:icons:home' format 'dir_states[HOME]'
+  zstyle -s ':prezto:module:prompt:ohcibi:dir:state:icons:homesub' format 'dir_states[HOME_SUBFOLDER]'
+  zstyle -s ':prezto:module:prompt:ohcibi:dir:state:icons:etc' format 'dir_states[ETC]'
+  zstyle -s ':prezto:module:prompt:ohcibi:dir:state:icons:node' format 'dir_states[NODE]'
+  zstyle -s ':prezto:module:prompt:ohcibi:dir:state:icons:git' format 'dir_states[GIT]'
+
+  local state_path="$(print -P '%~')"
+  local current_state="DEFAULT"
+  if [[ $state_path == '/etc'* ]]; then
+    current_state='ETC'
+  elif [[ $state_path == *'node_modules'* ]]; then
+    current_state='NODE'
+  elif [[ -n $vcs_info_msg_1_ ]]; then
+    current_state='GIT'
+  elif [[ $state_path == '~' ]]; then
+    current_state="HOME"
+  elif [[ $state_path == '~'* ]]; then
+    current_state="HOME_SUBFOLDER"
+  fi
+
+  local state=${dir_states[$current_state]}
+  local state_format
+  local state_formatted
+  zstyle -s ':prezto:module:prompt:ohcibi:dir:state:state' format 'state_format'
+  zformat -f state_formatted "$state_format" "s:$state"
+
+  if [[ ! -w "$PWD" ]]; then
+    local locked
+    local locked_format
+    local locked_formatted
+    zstyle -s ':prezto:module:prompt:ohcibi:dir:state:icons:locked' format 'locked'
+    zstyle -s ':prezto:module:prompt:ohcibi:dir:state:locked' format 'locked_format'
+    zformat -f locked_formatted "$locked_format" "s:$locked"
+
+    state_formatted="$locked_formatted $state_formatted"
+  fi
+
+  dir_info[state]=$state_formatted
+}
+
 function prompt_ohcibi_precmd {
   vcs_info
   git-info
   ruby-info
   python-info
+  dir-info
 
   unset exec_time
   typeset -gA exec_time
@@ -318,6 +364,16 @@ function prompt_ohcibi_setup {
   zstyle ':prezto:module:python:info:virtualenv' format "%F{094}%v%f"
 
   zstyle ':prezto:module:node:info:version' format '%F{028}%f %F{070}%v%f'
+
+  zstyle ':prezto:module:prompt:ohcibi:dir:state:state' format '%F{015}%s%f'
+  zstyle ':prezto:module:prompt:ohcibi:dir:state:locked' format '%F{129}%s%f'
+  zstyle ':prezto:module:prompt:ohcibi:dir:state:icons:default' format ''
+  zstyle ':prezto:module:prompt:ohcibi:dir:state:icons:home' format ''
+  zstyle ':prezto:module:prompt:ohcibi:dir:state:icons:homesub' format ''
+  zstyle ':prezto:module:prompt:ohcibi:dir:state:icons:etc' format ''
+  zstyle ':prezto:module:prompt:ohcibi:dir:state:icons:node' format ''
+  zstyle ':prezto:module:prompt:ohcibi:dir:state:icons:git' format ''
+  zstyle ':prezto:module:prompt:ohcibi:dir:state:icons:locked' format ''
 }
 
 render_prompt() {
@@ -341,10 +397,10 @@ render_prompt() {
   path_string=$path_color'%B${vcs_info_msg_1_:+${vcs_info_msg_1_}/}%b'$path_color'%'$max_path_chars'<...<${vcs_info_msg_0_%%.}%<<%b%f'
 
   if [[ -n $vcs_info_msg_1_ ]]; then
-    path_string=" $path_string ${git_info[prompt]}"
+    path_string="$path_string ${git_info[prompt]}"
   fi
 
-  preprompt_parts+=("%K{015}%F{189}%f $path_string %F{189}%F%k")
+  preprompt_parts+=("%K{063}%F{189}%f ${dir_info[state]} %K{015}%F{063}%f $path_string %F{189}%f%k")
 
   local -a info_string_parts
   [[ -n ${ruby_info[version]} ]]   && info_string_parts+=('${${ruby_info[version]}/-ruby/}')
