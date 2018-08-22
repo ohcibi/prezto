@@ -148,42 +148,45 @@ function prompt_ohcibi_precmd {
     "%F{166}"  # orange
     "%F{172}"  # dark yellow
     "%F{178}"  # yellow
-    "%F{184}"  # dark green
-    "%F{190}"  # yellow green
-    "%F{118}") # green
+    "%F{143}"  # yellow green
+    "%F{034}"  # green
+    "%F{112}") # light green
 
   local ic=(   # icon colors
-    "%F{161}%B"  # red
-    "%F{167}%B"  # orange
-    "%F{173}%B"  # dark yellow
-    "%F{179}%B"  # yellow
-    "%F{185}%B"  # dark green
-    "%F{191}%B"  # yellow green
-    "%F{119}%B") # green
+    "%F{161}"  # red
+    "%F{167}"  # orange
+    "%F{173}"  # dark yellow
+    "%F{179}"  # yellow
+    "%F{142}"  # green
+    "%F{040}"  # green
+    "%F{112}") # light green
+
+  # colortest:
+  # batteryps="$batteryps ${c[1]}10%f ${c[2]}10%f ${c[3]}10%f ${c[4]}10%f ${c[5]}10%f ${c[6]}10%f ${c[7]}10%f ${ic[1]}%f ${ic[2]}%f ${ic[3]}%f ${ic[4]}%f ${ic[5]}%f ${ic[6]}%f ${ic[7]}%f"
 
   if is-discharging; then
     if [ $perc_value -lt 10 ]; then
-      batteryps="${ic[1]}%b%f ${c[1]}${batteryps}%f"
+      batteryps="${ic[1]}%f ${c[1]}${batteryps}%f"
     elif [ $perc_value -lt 20 ]; then
-      batteryps="${ic[1]}%b%f ${c[1]}${batteryps}%f" # f579
+      batteryps="${ic[1]}%f ${c[1]}${batteryps}%f" # f579
     elif [ $perc_value -lt 30 ]; then
-      batteryps="${ic[2]}%b%f ${c[2]}${batteryps}%f" # f57a
+      batteryps="${ic[2]}%f ${c[2]}${batteryps}%f" # f57a
     elif [ $perc_value -lt 40 ]; then
-      batteryps="${ic[2]}%b%f ${c[2]}${batteryps}%f" # f57b
+      batteryps="${ic[2]}%f ${c[2]}${batteryps}%f" # f57b
     elif [ $perc_value -lt 50 ]; then
-      batteryps="${ic[3]}%b%f ${c[3]}${batteryps}%f" # f57c
+      batteryps="${ic[3]}%f ${c[3]}${batteryps}%f" # f57c
     elif [ $perc_value -lt 60 ]; then
-      batteryps="${ic[3]}%b%f ${c[3]}${batteryps}%f" # f57d
+      batteryps="${ic[3]}%f ${c[3]}${batteryps}%f" # f57d
     elif [ $perc_value -lt 70 ]; then
-      batteryps="${ic[4]}%b%f ${c[4]}${batteryps}%f" # f57e
+      batteryps="${ic[4]}%f ${c[4]}${batteryps}%f" # f57e
     elif [ $perc_value -lt 80 ]; then
-      batteryps="${ic[4]}%b%f ${c[4]}${batteryps}%f" # f57f
+      batteryps="${ic[5]}%f ${c[5]}${batteryps}%f" # f57f
     elif [ $perc_value -lt 90 ]; then
-      batteryps="${ic[5]}%b%f ${c[5]}${batteryps}%f" # f580
+      batteryps="${ic[6]}%f ${c[6]}${batteryps}%f" # f580
     elif [ $perc_value -lt 100 ]; then
-      batteryps="${ic[6]}%b%f ${c[6]}${batteryps}%f" # f581
+      batteryps="${ic[7]}%f ${c[7]}${batteryps}%f" # f581
     else
-      batteryps="${ic[7]}%b%f ${c[7]}${batteryps}%f" # f578
+      batteryps="${ic[7]}%f ${c[7]}${batteryps}%f" # f578
     fi
   else
     if [ $perc_value -lt 30 ]; then
@@ -321,7 +324,7 @@ function prompt_ohcibi_setup {
   local vcs_info_color='%F{242}'
   local def_color='%F{3}'
   local user_color='%F{17}'
-  local branch_color='%F{6}'
+  local branch_color='%F{066}'
   local action_color='%F{23}'
   local commit_color='%F{23}'
   local host_color='%F{52}'
@@ -399,13 +402,18 @@ render_prompt() {
     path_string="$path_string ${git_info[prompt]}"
   fi
 
-  preprompt_parts+=("%K{063}%F{189}%f ${dir_info[state]} %K{015}%F{063}%f $path_string %F{189}%f%k")
-
   local -a info_string_parts
+  local cc0=189
+  local ccs=018
+  local cc1=253
+  local cc2=255
+
+  info_string_parts+=("%K{$ccs}%F{$cc0}%f ${dir_info[state]} %K{$cc1}%F{$ccs}%f $path_string %F{$cc1}%K{$cc2}%f")
+
   [[ -n ${ruby_info[version]} ]]   && info_string_parts+=('${${ruby_info[version]}/-ruby/}')
   [[ -n ${node_info[version]} ]]   && info_string_parts+=('${node_info[version]}')
 
-  preprompt_parts+=("%K{015}%F{189}%f ${(j. .)info_string_parts} %F{189}%F%k")
+  preprompt_parts+=("${(j. .)info_string_parts} %F{$cc0}%f%k")
 
   [[ -n ${weather_info[prompt]} ]] && preprompt_parts+=('${weather_info[prompt]}')
 
@@ -437,7 +445,7 @@ render_prompt() {
 
   [[ -n ${battery_info[rprompt]} ]]   && rprompt_parts+=('%B${battery_info[rprompt]}%b')
 
-  RPROMPT="%K{015}%F{189}%f ${(j. .)rprompt_parts} %F{189}%f%k"
+  RPROMPT="%K{$cc2}%F{$cc0}%f ${(j. .)rprompt_parts} %F{$cc0}%f%k"
 
   SPROMPT="zsh: correct %F{red}%R%f to %F{green}%r%f [nyae]? "
 }
