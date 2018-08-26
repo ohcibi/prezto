@@ -319,8 +319,12 @@ function prompt_ohcibi_setup {
 
   # Customizable parameters.
   local path_color='%F{4}'
-  local success_color='%F{071}'
-  local failure_color='%F{124}'
+  local success_fg_cc=065
+  local success_bg_cc=158
+  local success_icon="%F{$success_fg_cc}ﭾ%f"
+  local failure_fg_cc=124
+  local failure_bg_cc=210
+  local failure_icon="%F{$failure_fg_cc}%f"
   local vcs_info_color='%F{242}'
   local def_color='%F{3}'
   local user_color='%F{17}'
@@ -337,8 +341,8 @@ function prompt_ohcibi_setup {
   zstyle ':vcs_info:*' nvcsformats "%~" ""
 
   zstyle ':prezto:module:editor:info:completing'                format '%B%F{red}...%f%b'
-  zstyle ':prezto:module:editor:info:keymap:primary'            format "%B%(?;${success_color}✔;${failure_color}✗)%f%b"
-  zstyle ':prezto:module:editor:info:keymap:alternate'          format '%F{166}☭%f'
+  zstyle ':prezto:module:editor:info:keymap:primary'            format "%(?;%K{$success_bg_cc};%K{$failure_bg_cc}) %(?;${success_icon};${failure_icon}) %(?;%F{$success_bg_cc};%F{$failure_bg_cc})%K{018}%f"
+  zstyle ':prezto:module:editor:info:keymap:alternate'          format "%K{254} %F{166}☭%f %K{018}%F{254}%f"
 
   zstyle ':prezto:module:git:info' verbose 'yes'
   zstyle ':prezto:module:git:info:action'                       format ' %%B%F{yellow}%s%f%%b'
@@ -395,6 +399,12 @@ render_prompt() {
     typeset -g prompt_newline=$'\n%{\r%}'
   fi
 
+  local cc0=189
+  local cccs=153
+  local ccs=018
+  local cc1=251
+  local cc2=253
+
   preprompt_parts+=('${editor_info[keymap]}')
   path_string=$path_color'%B${vcs_info_msg_1_:+${vcs_info_msg_1_}/}%b'$path_color'%'$max_path_chars'<...<${vcs_info_msg_0_%%.}%<<%b%f'
 
@@ -403,12 +413,8 @@ render_prompt() {
   fi
 
   local -a info_string_parts
-  local cc0=189
-  local ccs=018
-  local cc1=253
-  local cc2=255
 
-  info_string_parts+=("%K{$ccs}%F{$cc0}%f ${dir_info[state]} %K{$cc1}%F{$ccs}%f $path_string %F{$cc1}%K{$cc2}%f")
+  info_string_parts+=("%K{$ccs}%F{015}"'${dir_info[state]} '"%K{$cc1}%F{$ccs}%f $path_string %F{$cc1}%K{$cc2}%f")
 
   [[ -n ${ruby_info[version]} ]]   && info_string_parts+=('${${ruby_info[version]}/-ruby/}')
   [[ -n ${node_info[version]} ]]   && info_string_parts+=('${node_info[version]}')
@@ -445,7 +451,7 @@ render_prompt() {
 
   [[ -n ${battery_info[rprompt]} ]]   && rprompt_parts+=('%B${battery_info[rprompt]}%b')
 
-  RPROMPT="%K{$cc2}%F{$cc0}%f ${(j. .)rprompt_parts} %F{$cc0}%f%k"
+  RPROMPT="%K{$cc2}%F{$cc0}%f ${(j.  .)rprompt_parts} %F{$cc0}%f%k"
 
   SPROMPT="zsh: correct %F{red}%R%f to %F{green}%r%f [nyae]? "
 }
